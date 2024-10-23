@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:todo_list/todo_model.dart';
 
 class TodoList extends StatefulWidget {
@@ -9,7 +10,50 @@ class TodoList extends StatefulWidget {
 }
 
 class _TodoListState extends State<TodoList> {
+  TextEditingController taskcontroller = TextEditingController();
+
   final List<TodoModel> _tasks = [];
+
+  String formatdate(DateTime date) {
+    String formattedDate = DateFormat('d/M/yyyy').format(date);
+    return formattedDate;
+  }
+
+  void showbottom(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+              padding: EdgeInsets.all(15),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.red,
+              ),
+              child: Text("Text Field can not be empty"));
+        });
+  }
+
+  void addTask(BuildContext context) {
+    if (taskcontroller.text.isEmpty) {
+      showbottom(context);
+    } else {
+      TodoModel newtask = TodoModel(
+          task: taskcontroller.text, date: DateTime.now(), completed: false);
+
+      setState(() {
+        _tasks.add(newtask);
+      });
+
+      taskcontroller.clear();
+    }
+  }
+
+  void markcomplete(int index) {
+    setState(() {
+      _tasks[index].completed = !_tasks[index].completed;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,14 +88,15 @@ class _TodoListState extends State<TodoList> {
                 borderRadius: BorderRadius.circular(40)),
             child: Row(
               children: [
-                const Expanded(
+                Expanded(
                     child: TextField(
+                  controller: taskcontroller,
                   keyboardType: TextInputType.text,
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Color(0xFFDCDBFF),
                     fontSize: 23,
                   ),
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,
                     ),
@@ -65,17 +110,22 @@ class _TodoListState extends State<TodoList> {
                     ),
                   ),
                 )),
-                Container(
-                  height: 45,
-                  width: 45,
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue,
-                  ),
-                  child: const Icon(
-                    Icons.add,
-                    color: Colors.white,
-                    size: 30,
+                GestureDetector(
+                  onTap: () {
+                    addTask(context);
+                  },
+                  child: Container(
+                    height: 45,
+                    width: 45,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.blue,
+                    ),
+                    child: const Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 30,
+                    ),
                   ),
                 )
               ],
@@ -116,17 +166,22 @@ class _TodoListState extends State<TodoList> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: ListTile(
-                      leading: Container(
-                        height: 35,
-                        width: 35,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: Icon(
-                          Icons.check,
-                          color: todo.completed ? Colors.green : Colors.white,
-                          size: 30,
+                      leading: GestureDetector(
+                        onTap: () {
+                          markcomplete(index);
+                        },
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            color: todo.completed ? Colors.green : Colors.white,
+                            size: 30,
+                          ),
                         ),
                       ),
                       title: Text(
@@ -142,7 +197,7 @@ class _TodoListState extends State<TodoList> {
                             decorationColor: Colors.white),
                       ),
                       trailing: Text(
-                        todo.date,
+                        "${formatdate(todo.date)}",
                         style: const TextStyle(
                           color: Colors.blue,
                           fontSize: 20,
@@ -186,17 +241,22 @@ class _TodoListState extends State<TodoList> {
                       borderRadius: BorderRadius.circular(15),
                     ),
                     child: ListTile(
-                      leading: Container(
-                        height: 35,
-                        width: 35,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
-                        ),
-                        child: Icon(
-                          Icons.check,
-                          color: todo.completed ? Colors.green : Colors.white,
-                          size: 30,
+                      leading: GestureDetector(
+                        onTap: () {
+                          markcomplete(index);
+                        },
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: Icon(
+                            Icons.check,
+                            color: todo.completed ? Colors.green : Colors.white,
+                            size: 30,
+                          ),
                         ),
                       ),
                       title: Text(
@@ -212,7 +272,7 @@ class _TodoListState extends State<TodoList> {
                             decorationColor: Colors.white),
                       ),
                       trailing: Text(
-                        todo.date,
+                        "${formatdate(todo.date)}",
                         style: const TextStyle(
                           color: Colors.blue,
                           fontSize: 20,
